@@ -159,8 +159,8 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
     nonisolated func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         
-        // Retain the pixel buffer to ensure it's valid when dispatched
-        let buffer = pixelBuffer
+        // CVPixelBuffer is thread-safe for reading, safe to capture
+        nonisolated(unsafe) let buffer = pixelBuffer
         DispatchQueue.main.async { [weak self] in
             self?.currentFrame = buffer
         }
