@@ -10,6 +10,7 @@ import simd
 
 /// Represents the current state of the game
 enum GameState {
+    case menu
     case loading
     case ready
     case playing

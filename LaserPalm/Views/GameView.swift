@@ -36,6 +36,21 @@ struct GameView: View {
                     
                     Spacer()
                     
+                    // Pause/Menu Button
+                    Button(action: {
+                        viewModel.showMenu()
+                    }) {
+                        Image(systemName: "line.3.horizontal")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(12)
+                            .background(Color.black.opacity(0.6))
+                            .cornerRadius(10)
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Spacer()
+                    
                     // Stats
                     VStack(alignment: .trailing, spacing: 4) {
                         HStack {

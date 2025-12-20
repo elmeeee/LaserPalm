@@ -14,7 +14,11 @@ class VisionManager: ObservableObject {
     @Published var handGesture = HandGesture()
     
     private var lastProcessTime: Date = Date()
-    private let processingInterval: TimeInterval = 0.12 // ~8 FPS for Vision
+    private let processingInterval: TimeInterval = 0.05 // ~20 FPS for smoother tracking
+    
+    // Smoothing for position
+    private var smoothedPosition: SIMD2<Float> = .zero
+    private let smoothingFactor: Float = 0.3 // Lower = smoother but more lag
     
     /// Process frame for hand detection (throttled)
     func processFrame(_ pixelBuffer: CVPixelBuffer) {
@@ -99,11 +103,17 @@ class VisionManager: ObservableObject {
         let thumbIndexDistance = distance(thumbTip.location, indexTip.location)
         let isTriggerPulled = thumbIndexDistance < 0.08 // Threshold for trigger
         
+        // Apply smoothing to position
+        let rawPosition = SIMD2<Float>(Float(indexTip.location.x), Float(indexTip.location.y))
+        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
+            // Smooth position using exponential moving average
+            self.smoothedPosition = self.smoothedPosition * (1.0 - self.smoothingFactor) + rawPosition * self.smoothingFactor
+            
             self.handGesture.isDetected = isPistolGesture
-            self.handGesture.fingerTipPosition = SIMD2<Float>(Float(indexTip.location.x), Float(indexTip.location.y))
+            self.handGesture.fingerTipPosition = self.smoothedPosition
             self.handGesture.aimDirection = aimDirection
             self.handGesture.isTriggerPulled = isTriggerPulled && isPistolGesture
         }

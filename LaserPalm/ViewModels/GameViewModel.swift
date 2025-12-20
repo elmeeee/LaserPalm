@@ -11,7 +11,7 @@ import SceneKit
 
 /// Main game logic coordinator
 class GameViewModel: ObservableObject {
-    @Published var gameState: GameState = .loading
+    @Published var gameState: GameState = .menu
     @Published var stats = PlayerStats()
     @Published var enemies: [Enemy] = []
     @Published var floatingTexts: [FloatingText] = []
@@ -57,8 +57,15 @@ class GameViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    /// Start the game
+    /// Show menu
+    func showMenu() {
+        gameState = .menu
+        cameraManager.stop()
+    }
+    
+    /// Start the game (called from menu)
     func startGame() {
+        gameState = .loading
         cameraManager.requestPermission()
     }
     
