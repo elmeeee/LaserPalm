@@ -14,7 +14,7 @@ class Enemy: Identifiable {
     let id = UUID()
     var position: SIMD3<Float>
     var velocity: SIMD3<Float>
-    var radius: Float = 0.3
+    var radius: Float = 0.5  // Increased from 0.3 for easier hits
     var isAlive: Bool = true
     var node: SCNNode?
     

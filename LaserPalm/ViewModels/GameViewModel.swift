@@ -15,6 +15,7 @@ class GameViewModel: ObservableObject {
     @Published var stats = PlayerStats()
     @Published var enemies: [Enemy] = []
     @Published var floatingTexts: [FloatingText] = []
+    @Published var fingerTipPosition: SIMD2<Float> = SIMD2<Float>(0.5, 0.5) // Normalized screen position
     
     let cameraManager = CameraManager()
     let visionManager = VisionManager()
@@ -23,8 +24,9 @@ class GameViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private let maxEnemies = 4
     
-    // Magnetic aim assist
-    private let aimAssistRadius: Float = 0.5
+    // Magnetic aim assist - Increased for easier hits
+    private let aimAssistRadius: Float = 0.8  // Increased from 0.5
+    private let aimAssistStrength: Float = 0.5  // Stronger pull (was 0.3)
     
     init() {
         setupObservers()
@@ -45,6 +47,10 @@ class GameViewModel: ObservableObject {
         visionManager.$handGesture
             .sink { [weak self] gesture in
                 self?.handleGesture(gesture)
+                // Update finger tip position for crosshair
+                if gesture.isDetected {
+                    self?.fingerTipPosition = gesture.fingerTipPosition
+                }
             }
             .store(in: &cancellables)
         
@@ -177,9 +183,10 @@ class GameViewModel: ObservableObject {
         }
         
         if let enemy = closestEnemy {
-            // Gently pull aim toward enemy
+            // Gently pull aim toward enemy - Stronger pull for easier hits
             let toEnemy = normalize(enemy.position - rayOrigin)
-            return normalize(direction * 0.7 + toEnemy * 0.3)
+            let pullStrength = aimAssistStrength
+            return normalize(direction * (1.0 - pullStrength) + toEnemy * pullStrength)
         }
         
         return direction

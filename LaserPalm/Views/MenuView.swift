@@ -7,215 +7,343 @@
 
 import SwiftUI
 
-/// Main menu view
+/// Main menu view - Duck Hunt / Retro Arcade Style
 struct MenuView: View {
     @Binding var showMenu: Bool
     @State private var showLeaderboard = false
-    @State private var isAnimating = false
+    @State private var showHowToPlay = false
+    @State private var blinkOn = true
+    @State private var cursorBlink = true
     
     var onStartGame: () -> Void
     var onExit: () -> Void
     
     var body: some View {
         ZStack {
-            // Animated background
-            LinearGradient(
-                colors: [.black, .blue.opacity(0.3), .cyan.opacity(0.2), .black],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            .hueRotation(.degrees(isAnimating ? 45 : 0))
-            .animation(.linear(duration: 5).repeatForever(autoreverses: true), value: isAnimating)
+            // Retro sky blue background (Duck Hunt style)
+            Color(red: 0.4, green: 0.7, blue: 1.0)
+                .ignoresSafeArea()
             
-            VStack(spacing: 40) {
+            VStack(spacing: 0) {
                 Spacer()
+                    .frame(height: 80)
                 
-                // Logo & Title
-                VStack(spacing: 20) {
-                    Image(systemName: "hand.point.up.left.fill")
-                        .font(.system(size: 100))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.cyan, .blue],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .shadow(color: .cyan.opacity(0.5), radius: 20)
-                        .rotationEffect(.degrees(isAnimating ? 10 : -10))
-                        .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: isAnimating)
+                // Retro Title
+                VStack(spacing: 8) {
+                    Text("LASERPALM")
+                        .font(.system(size: 64, weight: .black, design: .monospaced))
+                        .foregroundColor(.white)
+                        .shadow(color: .black, radius: 0, x: 4, y: 4)
                     
-                    Text("LaserPalm")
-                        .font(.system(size: 72, weight: .black, design: .rounded))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.white, .cyan],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .shadow(color: .cyan.opacity(0.5), radius: 10)
-                    
-                    Text("Gesture Shooting Game")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(.gray)
+                    Text("GESTURE SHOOTING GAME")
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white)
+                        .tracking(2)
                 }
+                .padding(.bottom, 60)
                 
-                Spacer()
-                
-                // Menu Buttons
-                VStack(spacing: 20) {
-                    // Start Game Button
-                    MenuButton(
-                        icon: "play.fill",
-                        title: "START GAME",
-                        color: .cyan
-                    ) {
-                        onStartGame()
+                // Retro Menu Box
+                VStack(spacing: 0) {
+                    // Menu Items
+                    VStack(spacing: 16) {
+                        RetroMenuItem(
+                            text: "START GAME",
+                            icon: "▶",
+                            action: onStartGame
+                        )
+                        
+                        RetroMenuItem(
+                            text: "LEADERBOARD",
+                            icon: "★",
+                            action: { showLeaderboard = true }
+                        )
+                        
+                        RetroMenuItem(
+                            text: "HOW TO PLAY",
+                            icon: "?",
+                            action: { showHowToPlay = true }
+                        )
+                        
+                        RetroMenuItem(
+                            text: "QUIT",
+                            icon: "✕",
+                            action: onExit
+                        )
                     }
-                    
-                    // Leaderboard Button
-                    MenuButton(
-                        icon: "trophy.fill",
-                        title: "LEADERBOARD",
-                        color: .orange
-                    ) {
-                        showLeaderboard = true
-                    }
-                    
-                    // How to Play Button
-                    MenuButton(
-                        icon: "questionmark.circle.fill",
-                        title: "HOW TO PLAY",
-                        color: .green
-                    ) {
-                        // Show tutorial
-                    }
-                    
-                    // Exit Button
-                    MenuButton(
-                        icon: "xmark.circle.fill",
-                        title: "EXIT",
-                        color: .red
-                    ) {
-                        onExit()
-                    }
+                    .padding(32)
+                    .background(
+                        RoundedRectangle(cornerRadius: 0)
+                            .fill(Color.black.opacity(0.8))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 0)
+                                    .strokeBorder(Color.white, lineWidth: 4)
+                            )
+                    )
                 }
-                .padding(.horizontal, 40)
+                .frame(maxWidth: 500)
                 
                 Spacer()
                 
-                // Footer
-                Text("Use hand gestures to aim and shoot")
-                    .font(.system(size: 14))
-                    .foregroundColor(.gray.opacity(0.6))
-                    .padding(.bottom, 20)
+                // Retro Footer
+                VStack(spacing: 8) {
+                    HStack(spacing: 4) {
+                        Text("PRESS")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                        Text(cursorBlink ? "█" : " ")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                        Text("TO SELECT")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                    }
+                    .foregroundColor(.white)
+                    .onAppear {
+                        withAnimation(.easeInOut(duration: 0.5).repeatForever()) {
+                            cursorBlink.toggle()
+                        }
+                    }
+                    
+                    Text("© 2025 KAMY GAMES")
+                        .font(.system(size: 10, weight: .regular, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                .padding(.bottom, 24)
             }
         }
-        .onAppear {
-            isAnimating = true
-        }
         .sheet(isPresented: $showLeaderboard) {
-            LeaderboardView()
+            RetroLeaderboardView()
+        }
+        .sheet(isPresented: $showHowToPlay) {
+            RetroHowToPlayView()
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 0.8).repeatForever()) {
+                blinkOn.toggle()
+            }
         }
     }
 }
 
-/// Reusable menu button
-struct MenuButton: View {
+/// Retro menu item - Duck Hunt style
+struct RetroMenuItem: View {
+    let text: String
     let icon: String
-    let title: String
-    let color: Color
     let action: () -> Void
     
     @State private var isHovered = false
     
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 15) {
-                Image(systemName: icon)
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(.white)
-                    .frame(width: 40)
+            HStack(spacing: 16) {
+                Text(icon)
+                    .font(.system(size: 20, weight: .bold, design: .monospaced))
+                    .foregroundColor(isHovered ? .black : .white)
+                    .frame(width: 32)
                 
-                Text(title)
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                Text(text)
+                    .font(.system(size: 18, weight: .bold, design: .monospaced))
+                    .foregroundColor(isHovered ? .black : .white)
+                    .tracking(1)
                 
                 Spacer()
                 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.white.opacity(0.5))
+                Text(isHovered ? "►" : " ")
+                    .font(.system(size: 16, weight: .bold, design: .monospaced))
+                    .foregroundColor(.black)
             }
-            .padding(.horizontal, 30)
-            .padding(.vertical, 20)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 14)
             .background(
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(
-                        LinearGradient(
-                            colors: isHovered ? [color, color.opacity(0.7)] : [color.opacity(0.8), color.opacity(0.5)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .shadow(color: color.opacity(isHovered ? 0.6 : 0.3), radius: isHovered ? 20 : 10)
+                RoundedRectangle(cornerRadius: 0)
+                    .fill(isHovered ? Color.white : Color.clear)
             )
-            .scaleEffect(isHovered ? 1.05 : 1.0)
-            .animation(.spring(response: 0.3), value: isHovered)
         }
         .buttonStyle(.plain)
         .onHover { hovering in
-            isHovered = hovering
+            withAnimation(.easeInOut(duration: 0.1)) {
+                isHovered = hovering
+            }
         }
     }
 }
 
-/// Leaderboard view
-struct LeaderboardView: View {
+/// Retro Leaderboard View
+struct RetroLeaderboardView: View {
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            Color(red: 0.4, green: 0.7, blue: 1.0)
+                .ignoresSafeArea()
             
-            VStack(spacing: 30) {
+            VStack(spacing: 0) {
                 // Header
                 HStack {
-                    Text("🏆 Leaderboard")
-                        .font(.system(size: 36, weight: .bold, design: .rounded))
+                    Text("★ LEADERBOARD ★")
+                        .font(.system(size: 24, weight: .black, design: .monospaced))
                         .foregroundColor(.white)
+                        .shadow(color: .black, radius: 0, x: 2, y: 2)
                     
                     Spacer()
                     
                     Button(action: { dismiss() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 30))
-                            .foregroundColor(.gray)
+                        Text("✕")
+                            .font(.system(size: 24, weight: .bold, design: .monospaced))
+                            .foregroundColor(.white)
                     }
                     .buttonStyle(.plain)
                 }
                 .padding()
                 
-                // Placeholder
-                VStack(spacing: 20) {
-                    Image(systemName: "trophy.fill")
-                        .font(.system(size: 80))
-                        .foregroundColor(.orange)
+                // Content Box
+                VStack(spacing: 24) {
+                    Spacer()
                     
-                    Text("Coming Soon!")
-                        .font(.system(size: 24, weight: .bold))
+                    Text("★")
+                        .font(.system(size: 80, weight: .bold, design: .monospaced))
+                        .foregroundColor(.yellow)
+                        .shadow(color: .black, radius: 0, x: 3, y: 3)
+                    
+                    Text("COMING SOON!")
+                        .font(.system(size: 28, weight: .black, design: .monospaced))
+                        .foregroundColor(.white)
+                        .shadow(color: .black, radius: 0, x: 2, y: 2)
+                    
+                    Text("LEADERBOARD WILL BE")
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white)
+                    Text("AVAILABLE IN NEXT UPDATE")
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .foregroundColor(.white)
                     
-                    Text("Leaderboard will be available in the next update")
-                        .font(.system(size: 16))
-                        .foregroundColor(.gray)
-                        .multilineTextAlignment(.center)
+                    Spacer()
                 }
-                .frame(maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(32)
+                .background(
+                    RoundedRectangle(cornerRadius: 0)
+                        .fill(Color.black.opacity(0.8))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 0)
+                                .strokeBorder(Color.white, lineWidth: 4)
+                        )
+                )
+                .padding()
             }
         }
+        .frame(width: 600, height: 500)
+    }
+}
+
+/// Retro How to Play View
+struct RetroHowToPlayView: View {
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        ZStack {
+            Color(red: 0.4, green: 0.7, blue: 1.0)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Header
+                HStack {
+                    Text("? HOW TO PLAY ?")
+                        .font(.system(size: 24, weight: .black, design: .monospaced))
+                        .foregroundColor(.white)
+                        .shadow(color: .black, radius: 0, x: 2, y: 2)
+                    
+                    Spacer()
+                    
+                    Button(action: { dismiss() }) {
+                        Text("✕")
+                            .font(.system(size: 24, weight: .bold, design: .monospaced))
+                            .foregroundColor(.white)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding()
+                
+                // Content
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        RetroInstructionItem(
+                            number: "1",
+                            title: "MAKE PISTOL GESTURE",
+                            description: "EXTEND INDEX FINGER\nKEEP OTHER FINGERS CURLED"
+                        )
+                        
+                        RetroInstructionItem(
+                            number: "2",
+                            title: "AIM AT TARGETS",
+                            description: "POINT YOUR FINGER\nLASER SHOWS AIM DIRECTION"
+                        )
+                        
+                        RetroInstructionItem(
+                            number: "3",
+                            title: "SHOOT!",
+                            description: "MOVE THUMB TO INDEX FINGER\nEACH SHOT NEEDS NEW TRIGGER"
+                        )
+                        
+                        RetroInstructionItem(
+                            number: "4",
+                            title: "SCORE POINTS",
+                            description: "HIT TARGETS = +100 POINTS\nTRACK YOUR ACCURACY!"
+                        )
+                    }
+                    .padding(24)
+                }
+                .background(
+                    RoundedRectangle(cornerRadius: 0)
+                        .fill(Color.black.opacity(0.8))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 0)
+                                .strokeBorder(Color.white, lineWidth: 4)
+                        )
+                )
+                .padding()
+            }
+        }
+        .frame(width: 700, height: 600)
+    }
+}
+
+/// Retro instruction item
+struct RetroInstructionItem: View {
+    let number: String
+    let title: String
+    let description: String
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 16) {
+            // Number badge
+            Text(number)
+                .font(.system(size: 32, weight: .black, design: .monospaced))
+                .foregroundColor(.black)
+                .frame(width: 56, height: 56)
+                .background(
+                    Circle()
+                        .fill(Color.white)
+                )
+            
+            VStack(alignment: .leading, spacing: 6) {
+                Text(title)
+                    .font(.system(size: 16, weight: .black, design: .monospaced))
+                    .foregroundColor(.yellow)
+                    .shadow(color: .black, radius: 0, x: 1, y: 1)
+                
+                Text(description)
+                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                    .foregroundColor(.white)
+                    .lineSpacing(4)
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 0)
+                .fill(Color.white.opacity(0.1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 0)
+                        .strokeBorder(Color.white.opacity(0.3), lineWidth: 2)
+                )
+        )
     }
 }
 
