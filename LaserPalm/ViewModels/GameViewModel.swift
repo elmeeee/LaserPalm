@@ -17,6 +17,10 @@ class GameViewModel: ObservableObject {
     @Published var floatingTexts: [FloatingText] = []
     @Published var fingerTipPosition: SIMD2<Float> = SIMD2<Float>(0.5, 0.5) // Normalized screen position
     
+    // Level-based gameplay
+    @Published var currentLevel: Level?
+    @Published var showLevelComplete: Bool = false
+    
     let cameraManager = CameraManager()
     let visionManager = VisionManager()
     
@@ -98,7 +102,7 @@ class GameViewModel: ObservableObject {
     }
     
     /// Spawn a new enemy
-    private func spawnEnemy() {
+    func spawnEnemy() {
         let edge = Int.random(in: 0...3)
         var position: SIMD3<Float>
         var velocity: SIMD3<Float>

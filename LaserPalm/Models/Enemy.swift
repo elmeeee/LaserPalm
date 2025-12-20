@@ -9,18 +9,26 @@ import Foundation
 import SceneKit
 import simd
 
-/// Represents a flying disc enemy target
+/// Represents a flying animal enemy target
 class Enemy: Identifiable {
     let id = UUID()
+    let animalType: AnimalType
     var position: SIMD3<Float>
     var velocity: SIMD3<Float>
-    var radius: Float = 0.5  // Increased from 0.3 for easier hits
+    var radius: Float
     var isAlive: Bool = true
     var node: SCNNode?
     
-    init(position: SIMD3<Float>, velocity: SIMD3<Float>) {
+    init(animalType: AnimalType, position: SIMD3<Float>, velocity: SIMD3<Float>) {
+        self.animalType = animalType
         self.position = position
-        self.velocity = velocity
+        self.velocity = velocity * animalType.speedMultiplier
+        self.radius = animalType.size
+    }
+    
+    /// Convenience init for backward compatibility
+    convenience init(position: SIMD3<Float>, velocity: SIMD3<Float>) {
+        self.init(animalType: .sparrow, position: position, velocity: velocity)
     }
     
     /// Update enemy position based on delta time
@@ -54,5 +62,10 @@ class Enemy: Identifiable {
     /// Destroy the enemy
     func destroy() {
         isAlive = false
+    }
+    
+    /// Get points for hitting this enemy
+    var points: Int {
+        return animalType.points
     }
 }
