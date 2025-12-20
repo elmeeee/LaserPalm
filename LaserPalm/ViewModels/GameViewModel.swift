@@ -32,6 +32,9 @@ class GameViewModel: ObservableObject {
     private let aimAssistRadius: Float = 0.8  // Increased from 0.5
     private let aimAssistStrength: Float = 0.5  // Stronger pull (was 0.3)
     
+    // Trigger state tracking
+    private var lastTriggerState: Bool = false
+    
     init() {
         setupObservers()
     }
@@ -128,13 +131,21 @@ class GameViewModel: ObservableObject {
     
     /// Handle hand gesture input
     private func handleGesture(_ gesture: HandGesture) {
-        guard gameState == .playing, gesture.isDetected else { return }
+        guard gameState == .playing, gesture.isDetected else {
+            lastTriggerState = false
+            return
+        }
         
         // Check for trigger pull (state-based, not continuous)
-        if gesture.didTrigger {
+        // Only shoot when trigger transitions from false to true
+        let didTrigger = gesture.isTriggerPulled && !lastTriggerState
+        
+        if didTrigger {
             shoot(direction: gesture.aimDirection, fingerPosition: gesture.fingerTipPosition)
-            visionManager.handGesture.updateTriggerState()
         }
+        
+        // Update trigger state for next frame
+        lastTriggerState = gesture.isTriggerPulled
     }
     
     /// Shoot in the given direction

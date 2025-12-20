@@ -12,6 +12,7 @@ struct GameView: View {
     @ObservedObject var viewModel: GameViewModel
     @State private var crosshairPosition: CGPoint = .zero
     @State private var screenSize: CGSize = .zero
+    @State private var cursorHideTimer: Timer?
     
     // Environment (will be dynamic based on level)
     @State private var currentEnvironment: GameEnvironment = .forest
@@ -130,6 +131,17 @@ struct GameView: View {
             .onAppear {
                 screenSize = geometry.size
                 crosshairPosition = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                
+                // Hide cursor initially
+                NSCursor.hide()
+                
+                // Setup mouse move tracking to show cursor temporarily
+                setupCursorAutoHide()
+            }
+            .onDisappear {
+                // Show cursor when leaving game
+                NSCursor.unhide()
+                cursorHideTimer?.invalidate()
             }
             .onChange(of: viewModel.fingerTipPosition) { oldValue, newPosition in
                 // Mirror X because camera is mirrored
@@ -139,6 +151,28 @@ struct GameView: View {
                 
                 crosshairPosition = CGPoint(x: x, y: y)
             }
+        }
+        .onContinuousHover { phase in
+            // Show cursor when mouse moves
+            switch phase {
+            case .active:
+                NSCursor.unhide()
+                resetCursorHideTimer()
+            case .ended:
+                break
+            }
+        }
+    }
+    
+    private func setupCursorAutoHide() {
+        // Initial hide after 2 seconds
+        resetCursorHideTimer()
+    }
+    
+    private func resetCursorHideTimer() {
+        cursorHideTimer?.invalidate()
+        cursorHideTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
+            NSCursor.hide()
         }
     }
 }

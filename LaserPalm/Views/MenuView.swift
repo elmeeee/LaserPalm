@@ -36,17 +36,11 @@ struct MenuView: View {
                 // App Icon & Title
                 VStack(spacing: 16) {
                     // App Icon
-                    ZStack {
-                        Circle()
-                            .fill(Color(nsColor: .controlAccentColor).opacity(0.15))
-                            .frame(width: 100, height: 100)
-                        
-                        Image(systemName: "scope")
-                            .font(.system(size: 48, weight: .medium))
-                            .foregroundStyle(Color(nsColor: .controlAccentColor))
-                            .symbolRenderingMode(.hierarchical)
-                    }
-                    .shadow(color: .black.opacity(0.1), radius: 20, y: 10)
+                    Image("main-icon")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 112, height: 147)
+                        .shadow(color: .black.opacity(0.1), radius: 20, y: 10)
                     
                     // App Name
                     Text("LaserPalm")
@@ -416,9 +410,9 @@ struct ModernHowToPlayView: View {
             
             Divider()
             
-            // Content
+            // Content - Compact layout
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 14) {
                     ModernInstructionCard(
                         icon: "hand.point.up.left.fill",
                         title: "Make the Pistol Gesture",
@@ -442,12 +436,24 @@ struct ModernHowToPlayView: View {
                         title: "Score Points",
                         description: "Hit targets to score points. Complete levels to unlock new environments!"
                     )
+                    
+                    ModernInstructionCard(
+                        icon: "target",
+                        title: "Hit Accuracy",
+                        description: "Aim carefully! Your accuracy affects your star rating at the end of each level."
+                    )
+                    
+                    ModernInstructionCard(
+                        icon: "trophy.fill",
+                        title: "Unlock Levels",
+                        description: "Complete levels to unlock new environments with different animals and challenges."
+                    )
                 }
-                .padding(20)
+                .padding(18)
             }
             .background(Color(nsColor: .controlBackgroundColor))
         }
-        .frame(width: 600, height: 500)
+        .frame(width: 600, height: 580)
     }
 }
 
@@ -458,25 +464,25 @@ struct ModernInstructionCard: View {
     let description: String
     
     var body: some View {
-        HStack(alignment: .top, spacing: 16) {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 32))
+                .font(.system(size: 26))
                 .foregroundStyle(Color(nsColor: .controlAccentColor))
                 .symbolRenderingMode(.hierarchical)
-                .frame(width: 48)
+                .frame(width: 36)
             
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Color(nsColor: .labelColor))
                 
                 Text(description)
-                    .font(.system(size: 14))
+                    .font(.system(size: 12))
                     .foregroundStyle(Color(nsColor: .secondaryLabelColor))
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(16)
+        .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(Color(nsColor: .controlBackgroundColor))
