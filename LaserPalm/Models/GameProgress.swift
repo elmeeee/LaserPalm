@@ -34,7 +34,6 @@ class GameProgress: ObservableObject {
         loadProgress()
     }
     
-    // MARK: - Level Management
     
     func isLevelUnlocked(_ levelId: Int) -> Bool {
         return unlockedLevels.contains(levelId)
@@ -101,7 +100,6 @@ class GameProgress: ObservableObject {
         return 0
     }
     
-    // MARK: - Achievements
     
     func checkAchievements() {
         // First Blood
@@ -143,7 +141,6 @@ class GameProgress: ObservableObject {
         }
     }
     
-    // MARK: - Persistence
     
     private func saveProgress() {
         let data = ProgressData(

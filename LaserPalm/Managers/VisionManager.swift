@@ -54,7 +54,6 @@ class VisionManager: ObservableObject {
             
         } catch {
             // Fail gracefully - don't crash
-            print("Vision processing error: \(error.localizedDescription)")
             DispatchQueue.main.async { [weak self] in
                 self?.handGesture.isDetected = false
             }

@@ -26,14 +26,12 @@ extension GameViewModel {
     /// Spawn enemy based on current level
     func spawnLevelEnemy() {
         guard let level = currentLevel else {
-            print("⚠️ No level set, using fallback spawn")
             spawnEnemy()  // Fallback to default
             return
         }
         
         // Random animal from level's animal types
         let animalType = level.animalTypes.randomElement() ?? .sparrow
-        print("🎯 Spawning \(animalType.displayName) for level: \(level.name)")
         
         var position: SIMD3<Float>
         var velocity: SIMD3<Float>
@@ -94,7 +92,6 @@ extension GameViewModel {
         }
         
         let enemy = Enemy(animalType: animalType, position: position, velocity: velocity)
-        print("   Position: \(position), Velocity: \(velocity)")
         enemies.append(enemy)
     }
     

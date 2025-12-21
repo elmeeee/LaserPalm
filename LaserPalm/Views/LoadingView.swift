@@ -104,7 +104,6 @@ struct LoadingView: View {
         }
     }
     
-    // MARK: - State Views
     
     private func errorStateView(error: String) -> some View {
         VStack(spacing: 20) {
@@ -221,7 +220,6 @@ struct LoadingView: View {
         .padding(.horizontal, 40)
     }
     
-    // MARK: - Helper Functions
     
     private func startAnimations() {
         // Pulse animation
@@ -247,7 +245,6 @@ struct LoadingView: View {
     }
 }
 
-// MARK: - Supporting Views
 
 struct StatusIndicator: View {
     let icon: String

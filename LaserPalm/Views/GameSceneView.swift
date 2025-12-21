@@ -81,7 +81,6 @@ struct GameSceneView: NSViewRepresentable {
         return node
     }
     
-    // MARK: - Coordinator
     class Coordinator: NSObject, SCNSceneRendererDelegate {
         var viewModel: GameViewModel
         weak var sceneView: SCNView?

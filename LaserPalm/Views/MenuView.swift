@@ -243,7 +243,6 @@ struct LevelCard: View {
         Button(action: {
             if level.isUnlocked {
                 // Start level - will be connected to GameViewModel
-                print("Start level \(level.id)")
             }
         }) {
             VStack(spacing: 12) {

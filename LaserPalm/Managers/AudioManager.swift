@@ -43,7 +43,6 @@ class AudioManager: ObservableObject {
         // Custom sounds can be added later
     }
     
-    // MARK: - Game Sounds
     
     /// Play hit sound
     func playHitSound() {
@@ -85,7 +84,6 @@ class AudioManager: ObservableObject {
         }
     }
     
-    // MARK: - Environment Ambience
     
     /// Start playing environment ambience
     func playEnvironmentAmbience(_ environment: GameEnvironment) {
@@ -132,7 +130,6 @@ class AudioManager: ObservableObject {
         currentEnvironment = nil
     }
     
-    // MARK: - UI Sounds
     
     /// Play button click sound
     func playButtonSound() {
