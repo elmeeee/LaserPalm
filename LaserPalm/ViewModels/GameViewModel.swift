@@ -17,9 +17,14 @@ class GameViewModel: ObservableObject {
     @Published var floatingTexts: [FloatingText] = []
     @Published var fingerTipPosition: SIMD2<Float> = SIMD2<Float>(0.5, 0.5) // Normalized screen position
     
+    
     // Level-based gameplay
     @Published var currentLevel: Level?
     @Published var showLevelComplete: Bool = false
+    
+    // Improvements
+    @Published var comboSystem = ComboSystem()
+    @Published var screenShake = ScreenShakeManager()
     
     let cameraManager = CameraManager()
     let visionManager = VisionManager()
@@ -233,14 +238,31 @@ class GameViewModel: ObservableObject {
     /// Handle successful hit
     private func handleHit(enemy: Enemy) {
         enemy.destroy()
-        stats.score += 100
+        
+        // Add to combo
+        comboSystem.addHit()
+        
+        // Calculate score with multiplier
+        let baseScore = 100
+        let finalScore = Int(Float(baseScore) * comboSystem.multiplier)
+        stats.score += finalScore
         stats.hits += 1
+        
+        // Screen shake for impact
+        screenShake.shake(intensity: 8)
         
         AudioManager.shared.playHitSound()
         
-        // Add floating "HIT" text
-        let text = FloatingText(text: "HIT", position: enemy.position)
-        floatingTexts.append(text)
+        // Add floating text with combo info
+        let text: String
+        if comboSystem.currentCombo >= 3 {
+            text = "+\(finalScore) \(comboSystem.comboText)"
+        } else {
+            text = "+\(finalScore)"
+        }
+        
+        let floatingText = FloatingText(text: text, position: enemy.position)
+        floatingTexts.append(floatingText)
         
         // Spawn replacement enemy
         spawnLevelEnemy()
@@ -249,6 +271,9 @@ class GameViewModel: ObservableObject {
     /// Handle miss
     private func handleMiss(direction: SIMD3<Float>) {
         stats.misses += 1
+        
+        // Break combo on miss
+        comboSystem.breakCombo()
         
         AudioManager.shared.playMissSound()
         

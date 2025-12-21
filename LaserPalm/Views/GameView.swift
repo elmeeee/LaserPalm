@@ -41,6 +41,7 @@ struct GameView: View {
                 // 3D Scene (with transparent background)
                 GameSceneView(viewModel: viewModel)
                     .ignoresSafeArea()
+                    .screenShake($viewModel.screenShake.shakeOffset)
                 
                 // Modern Clean HUD
                 VStack(spacing: 0) {
@@ -88,6 +89,37 @@ struct GameView: View {
                         .buttonStyle(.plain)
                     }
                     .padding(16)
+                    
+                    Spacer()
+                    
+                    // Combo Display (Center)
+                    if viewModel.comboSystem.currentCombo >= 3 {
+                        VStack(spacing: 8) {
+                            Text(viewModel.comboSystem.comboText)
+                                .font(.system(size: 36, weight: .bold))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [.yellow, .orange, .red],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
+                            
+                            Text("\(String(format: "%.1f", viewModel.comboSystem.multiplier))x MULTIPLIER")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(.white)
+                                .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
+                        }
+                        .padding(20)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.black.opacity(0.6))
+                                .blur(radius: 10)
+                        )
+                        .transition(.scale.combined(with: .opacity))
+                        .animation(.spring(response: 0.3), value: viewModel.comboSystem.currentCombo)
+                    }
                     
                     Spacer()
                     
