@@ -341,10 +341,9 @@ struct ModernLeaderboardView: View {
                     .foregroundStyle(Color(nsColor: .labelColor))
                 
                 Spacer()
-                
-                Color.clear.frame(width: 60)
             }
-            .padding()
+            .padding(.all, 16)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color(nsColor: .windowBackgroundColor))
             
             Divider()
@@ -400,12 +399,10 @@ struct ModernHowToPlayView: View {
                 Text("How to Play")
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(Color(nsColor: .labelColor))
-                
                 Spacer()
-                
-                Color.clear.frame(width: 60)
             }
-            .padding()
+            .padding(.all, 16)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color(nsColor: .windowBackgroundColor))
             
             Divider()

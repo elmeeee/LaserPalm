@@ -23,12 +23,6 @@ struct LaserPalmApp: App {
             CommandGroup(replacing: .newItem) { }
             
             // Add custom menu items
-            CommandGroup(after: .appInfo) {
-                Button("How to Play") {
-                    // Show how to play instructions
-                }
-                .keyboardShortcut("?", modifiers: .command)
-            }
         }
         
         Settings {
