@@ -28,9 +28,9 @@ class GameViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private let maxEnemies = 4
     
-    // Minimal aim assist - Skill-based aiming required!
-    private let aimAssistRadius: Float = 0.15  // Very small radius - must aim precisely
-    private let aimAssistStrength: Float = 0.1  // Minimal assist (10%)
+    // Aim assist - Temporarily increased for testing
+    private let aimAssistRadius: Float = 0.3  // Increased from 0.15 for testing
+    private let aimAssistStrength: Float = 0.3  // Increased from 0.1 for testing
     
     // Trigger state tracking
     private var lastTriggerState: Bool = false
@@ -178,6 +178,8 @@ class GameViewModel: ObservableObject {
         )
         let normalizedRayDir = normalize(rayDir)
         
+        print("🎯 SHOOT - Finger: \(fingerPosition), Ray: \(normalizedRayDir)")
+        
         // Apply minimal aim assist (optional, very subtle)
         let finalDirection = applyAimAssist(direction: normalizedRayDir)
         
@@ -185,9 +187,13 @@ class GameViewModel: ObservableObject {
         var hitEnemy: Enemy?
         var closestDistance: Float = Float.infinity
         
+        print("   Checking \(enemies.count) enemies...")
         for enemy in enemies where enemy.isAlive {
-            if enemy.checkCollision(rayOrigin: rayOrigin, rayDirection: finalDirection) {
-                let distance = length(enemy.position - rayOrigin)
+            let collides = enemy.checkCollision(rayOrigin: rayOrigin, rayDirection: finalDirection)
+            let distance = length(enemy.position - rayOrigin)
+            print("   - \(enemy.animalType.displayName) at \(enemy.position), dist: \(distance), collides: \(collides)")
+            
+            if collides {
                 if distance < closestDistance {
                     closestDistance = distance
                     hitEnemy = enemy
@@ -197,9 +203,11 @@ class GameViewModel: ObservableObject {
         
         if let enemy = hitEnemy {
             // Hit!
+            print("✅ HIT: \(enemy.animalType.displayName)")
             handleHit(enemy: enemy)
         } else {
             // Miss
+            print("❌ MISS")
             handleMiss(direction: finalDirection)
         }
     }
