@@ -81,6 +81,16 @@ class CameraManager: NSObject, ObservableObject {
                 // Configure session
                 print("📹 Configuring capture session...")
                 self.captureSession.beginConfiguration()
+                
+                // Remove all existing inputs and outputs (in case of restart)
+                print("🧹 Cleaning up existing inputs/outputs...")
+                for input in self.captureSession.inputs {
+                    self.captureSession.removeInput(input)
+                }
+                for output in self.captureSession.outputs {
+                    self.captureSession.removeOutput(output)
+                }
+                
                 self.captureSession.sessionPreset = .vga640x480
                 
                 // Get camera device
@@ -148,8 +158,13 @@ class CameraManager: NSObject, ObservableObject {
     
     /// Stop camera session
     func stop() {
+        print("🛑 Stopping camera session...")
         sessionQueue.async { [weak self] in
             self?.captureSession.stopRunning()
+        }
+        // Reset ready state so it can be reinitialized
+        DispatchQueue.main.async { [weak self] in
+            self?.isReady = false
         }
     }
 }
