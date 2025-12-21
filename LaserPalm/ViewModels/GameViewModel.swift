@@ -28,9 +28,9 @@ class GameViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private let maxEnemies = 4
     
-    // Magnetic aim assist - Increased for easier hits
-    private let aimAssistRadius: Float = 0.8  // Increased from 0.5
-    private let aimAssistStrength: Float = 0.5  // Stronger pull (was 0.3)
+    // Minimal aim assist - Skill-based aiming required!
+    private let aimAssistRadius: Float = 0.15  // Very small radius - must aim precisely
+    private let aimAssistStrength: Float = 0.1  // Minimal assist (10%)
     
     // Trigger state tracking
     private var lastTriggerState: Bool = false
@@ -155,15 +155,33 @@ class GameViewModel: ObservableObject {
         // Ray origin (camera position)
         let rayOrigin = SIMD3<Float>(0, 0, 0)
         
-        // Apply magnetic aim assist
-        let assistedDirection = applyAimAssist(direction: direction)
+        // Convert finger position (0-1 normalized) to world direction
+        // Map finger position to screen space, then to 3D ray
+        // Center of screen is (0.5, 0.5), we need to convert to direction
+        let screenX = (fingerPosition.x - 0.5) * 2.0  // -1 to 1
+        let screenY = (fingerPosition.y - 0.5) * 2.0  // -1 to 1
+        
+        // Create ray direction from finger position
+        // Adjust FOV and aspect ratio for accurate aiming
+        let fov: Float = 60.0 * .pi / 180.0  // 60 degrees FOV
+        let aspect: Float = 16.0 / 9.0  // Typical aspect ratio
+        
+        let rayDir = SIMD3<Float>(
+            screenX * tan(fov / 2.0) * aspect,
+            -screenY * tan(fov / 2.0),  // Inverted Y
+            -1.0  // Looking down -Z axis
+        )
+        let normalizedRayDir = normalize(rayDir)
+        
+        // Apply minimal aim assist (optional, very subtle)
+        let finalDirection = applyAimAssist(direction: normalizedRayDir)
         
         // Check collision with enemies
         var hitEnemy: Enemy?
         var closestDistance: Float = Float.infinity
         
         for enemy in enemies where enemy.isAlive {
-            if enemy.checkCollision(rayOrigin: rayOrigin, rayDirection: assistedDirection) {
+            if enemy.checkCollision(rayOrigin: rayOrigin, rayDirection: finalDirection) {
                 let distance = length(enemy.position - rayOrigin)
                 if distance < closestDistance {
                     closestDistance = distance
@@ -177,7 +195,7 @@ class GameViewModel: ObservableObject {
             handleHit(enemy: enemy)
         } else {
             // Miss
-            handleMiss(direction: assistedDirection)
+            handleMiss(direction: finalDirection)
         }
     }
     

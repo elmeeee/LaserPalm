@@ -57,15 +57,15 @@ enum AnimalType: String, Codable {
     var size: Float {
         switch self {
         case .sparrow, .robin, .finch:
-            return 0.3
+            return 0.2  // Reduced from 0.3 - smaller hitbox
         case .parrot, .toucan, .macaw:
-            return 0.4
+            return 0.25  // Reduced from 0.4
         case .wolf, .fox, .lynx:
-            return 0.5
+            return 0.3  // Reduced from 0.5
         case .lion, .tiger, .bear:
-            return 0.6
+            return 0.35  // Reduced from 0.6
         case .eagle, .hawk, .falcon:
-            return 0.7
+            return 0.4  // Reduced from 0.7
         }
     }
     
