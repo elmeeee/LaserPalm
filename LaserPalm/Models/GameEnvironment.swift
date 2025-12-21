@@ -49,6 +49,10 @@ enum GameEnvironment: String, Codable {
         }
     }
     
+    var backgroundImageName: String {
+        return "bg_\(rawValue)"
+    }
+    
     var background: LinearGradient {
         switch self {
         case .forest:

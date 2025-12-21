@@ -14,15 +14,32 @@ struct GameView: View {
     @State private var screenSize: CGSize = .zero
     @State private var cursorHideTimer: Timer?
     
-    // Environment (will be dynamic based on level)
-    @State private var currentEnvironment: GameEnvironment = .forest
+    
+    // Environment - Dynamic based on current level
+    private var currentEnvironment: GameEnvironment {
+        return viewModel.currentLevel?.environment ?? .forest
+    }
     
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Environment Background
-                currentEnvironment.background
-                    .ignoresSafeArea()
+                // Environment Background - Responsive Image
+                ZStack {
+                    // Try to load background image first
+                    if let backgroundImage = NSImage(named: currentEnvironment.backgroundImageName) {
+                        print("✅ Loaded background: \(currentEnvironment.backgroundImageName)")
+                        Image(nsImage: backgroundImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .clipped()
+                    } else {
+                        // Fallback to gradient if image not found
+                        print("⚠️ Background image not found: \(currentEnvironment.backgroundImageName), using gradient")
+                        currentEnvironment.background
+                    }
+                }
+                .ignoresSafeArea()
                 
                 // 3D Scene (with transparent background)
                 GameSceneView(viewModel: viewModel)

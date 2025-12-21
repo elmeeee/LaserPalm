@@ -18,7 +18,7 @@ struct GameSceneView: NSViewRepresentable {
         // Create scene
         let scene = SCNScene()
         sceneView.scene = scene
-        sceneView.backgroundColor = .black
+        sceneView.backgroundColor = .clear  // Transparent to show background image
         sceneView.autoenablesDefaultLighting = true
         sceneView.allowsCameraControl = false
         
