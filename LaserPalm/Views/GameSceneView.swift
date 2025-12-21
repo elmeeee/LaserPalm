@@ -116,8 +116,8 @@ struct GameSceneView: NSViewRepresentable {
                     // Update existing node
                     enemy.node = node
                 } else {
-                    // Create new node
-                    let node = createEnemyNode()
+                    // Create new node with animal type
+                    let node = createEnemyNode(for: enemy.animalType)
                     node.position = SCNVector3(enemy.position.x, enemy.position.y, enemy.position.z)
                     scene.rootNode.addChildNode(node)
                     enemyNodes[enemy.id] = node
@@ -149,20 +149,31 @@ struct GameSceneView: NSViewRepresentable {
             }
         }
         
-        /// Create enemy disc node
-        private func createEnemyNode() -> SCNNode {
-            let disc = SCNCylinder(radius: 0.3, height: 0.05)
-            disc.firstMaterial?.diffuse.contents = NSColor.systemRed
-            disc.firstMaterial?.specular.contents = NSColor.white
-            disc.firstMaterial?.emission.contents = NSColor.systemRed.withAlphaComponent(0.3)
+        /// Create enemy node with animal sprite
+        private func createEnemyNode(for animalType: AnimalType) -> SCNNode {
+            // Create a plane to display the sprite
+            let plane = SCNPlane(width: CGFloat(animalType.size * 2), height: CGFloat(animalType.size * 2))
             
-            let node = SCNNode(geometry: disc)
-            node.eulerAngles = SCNVector3(Float.pi / 2, 0, 0)
+            // Try to load the animal image, fallback to colored disc if not available
+            if let image = NSImage(named: animalType.imageName) {
+                plane.firstMaterial?.diffuse.contents = image
+                plane.firstMaterial?.isDoubleSided = true
+                plane.firstMaterial?.lightingModel = .constant  // No lighting, just show the image
+            } else {
+                // Fallback to colored disc for animals without images
+                plane.firstMaterial?.diffuse.contents = NSColor.systemRed
+                plane.firstMaterial?.emission.contents = NSColor.systemRed.withAlphaComponent(0.3)
+            }
             
-            // Add rotation animation
-            let rotation = SCNAction.rotateBy(x: 0, y: 0, z: CGFloat.pi * 2, duration: 2)
-            let repeatRotation = SCNAction.repeatForever(rotation)
-            node.runAction(repeatRotation)
+            let node = SCNNode(geometry: plane)
+            
+            // Add subtle floating animation
+            let floatUp = SCNAction.moveBy(x: 0, y: 0.1, z: 0, duration: 1.0)
+            floatUp.timingMode = .easeInEaseOut
+            let floatDown = floatUp.reversed()
+            let floatSequence = SCNAction.sequence([floatUp, floatDown])
+            let repeatFloat = SCNAction.repeatForever(floatSequence)
+            node.runAction(repeatFloat)
             
             return node
         }

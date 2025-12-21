@@ -102,6 +102,10 @@ enum AnimalType: String, Codable {
     var displayName: String {
         return rawValue.capitalized
     }
+    
+    var imageName: String {
+        return "enemy_\(rawValue)"
+    }
 }
 
 /// Difficulty levels
