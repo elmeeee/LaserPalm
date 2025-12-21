@@ -78,6 +78,11 @@ class GameViewModel: ObservableObject {
     
     /// Start the game (called from menu)
     func startGame() {
+        // Set default level if none selected (Forest - Level 1)
+        if currentLevel == nil {
+            currentLevel = Level.allLevels.first
+        }
+        
         gameState = .loading
         cameraManager.requestPermission()
     }
@@ -100,7 +105,7 @@ class GameViewModel: ObservableObject {
     /// Spawn initial enemies
     private func spawnInitialEnemies() {
         for _ in 0..<maxEnemies {
-            spawnEnemy()
+            spawnLevelEnemy()
         }
     }
     
@@ -238,7 +243,7 @@ class GameViewModel: ObservableObject {
         floatingTexts.append(text)
         
         // Spawn replacement enemy
-        spawnEnemy()
+        spawnLevelEnemy()
     }
     
     /// Handle miss
@@ -278,7 +283,7 @@ class GameViewModel: ObservableObject {
         
         let removed = beforeCount - enemies.count
         for _ in 0..<removed {
-            spawnEnemy()
+            spawnLevelEnemy()
         }
         
         // Update floating texts

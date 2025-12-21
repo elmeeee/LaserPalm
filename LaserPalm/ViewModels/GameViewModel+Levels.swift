@@ -26,33 +26,75 @@ extension GameViewModel {
     /// Spawn enemy based on current level
     func spawnLevelEnemy() {
         guard let level = currentLevel else {
+            print("⚠️ No level set, using fallback spawn")
             spawnEnemy()  // Fallback to default
             return
         }
         
         // Random animal from level's animal types
         let animalType = level.animalTypes.randomElement() ?? .sparrow
+        print("🎯 Spawning \(animalType.displayName) for level: \(level.name)")
         
-        let edge = Int.random(in: 0...3)
         var position: SIMD3<Float>
         var velocity: SIMD3<Float>
         
-        switch edge {
-        case 0: // Left
-            position = SIMD3<Float>(-10, Float.random(in: -3...3), Float.random(in: -8...(-5)))
-            velocity = SIMD3<Float>(Float.random(in: 1...2), Float.random(in: -0.5...0.5), Float.random(in: 0.5...1))
-        case 1: // Right
-            position = SIMD3<Float>(10, Float.random(in: -3...3), Float.random(in: -8...(-5)))
-            velocity = SIMD3<Float>(Float.random(in: -2...(-1)), Float.random(in: -0.5...0.5), Float.random(in: 0.5...1))
-        case 2: // Top
-            position = SIMD3<Float>(Float.random(in: -5...5), 8, Float.random(in: -8...(-5)))
-            velocity = SIMD3<Float>(Float.random(in: -0.5...0.5), Float.random(in: -2...(-1)), Float.random(in: 0.5...1))
-        default: // Bottom
-            position = SIMD3<Float>(Float.random(in: -5...5), -8, Float.random(in: -8...(-5)))
-            velocity = SIMD3<Float>(Float.random(in: -0.5...0.5), Float.random(in: 1...2), Float.random(in: 0.5...1))
+        // Determine spawn based on animal type
+        switch animalType {
+        // Small birds - Fly horizontally at mid-height
+        case .sparrow, .robin, .finch:
+            let fromLeft = Bool.random()
+            let yPos = Float.random(in: 0...3)  // Mid-air height
+            
+            if fromLeft {
+                position = SIMD3<Float>(-10, yPos, Float.random(in: -8...(-5)))
+                velocity = SIMD3<Float>(Float.random(in: 1.5...2.5), Float.random(in: -0.3...0.3), 0)
+            } else {
+                position = SIMD3<Float>(10, yPos, Float.random(in: -8...(-5)))
+                velocity = SIMD3<Float>(Float.random(in: -2.5...(-1.5)), Float.random(in: -0.3...0.3), 0)
+            }
+            
+        // Medium birds - Fly horizontally at mid-height, slightly faster
+        case .parrot, .toucan, .macaw:
+            let fromLeft = Bool.random()
+            let yPos = Float.random(in: 1...4)  // Mid-air height
+            
+            if fromLeft {
+                position = SIMD3<Float>(-10, yPos, Float.random(in: -8...(-5)))
+                velocity = SIMD3<Float>(Float.random(in: 2...3), Float.random(in: -0.4...0.4), 0)
+            } else {
+                position = SIMD3<Float>(10, yPos, Float.random(in: -8...(-5)))
+                velocity = SIMD3<Float>(Float.random(in: -3...(-2)), Float.random(in: -0.4...0.4), 0)
+            }
+            
+        // Ground animals - Run on ground level
+        case .lion, .tiger, .bear, .wolf, .fox, .lynx:
+            let fromLeft = Bool.random()
+            let yPos: Float = -2  // Ground level
+            
+            if fromLeft {
+                position = SIMD3<Float>(-10, yPos, Float.random(in: -8...(-5)))
+                velocity = SIMD3<Float>(Float.random(in: 2...3.5), 0, 0)  // Run horizontally on ground
+            } else {
+                position = SIMD3<Float>(10, yPos, Float.random(in: -8...(-5)))
+                velocity = SIMD3<Float>(Float.random(in: -3.5...(-2)), 0, 0)  // Run horizontally on ground
+            }
+            
+        // Flying predators - Soar at high altitude
+        case .eagle, .hawk, .falcon:
+            let fromLeft = Bool.random()
+            let yPos = Float.random(in: 3...6)  // High altitude
+            
+            if fromLeft {
+                position = SIMD3<Float>(-10, yPos, Float.random(in: -8...(-5)))
+                velocity = SIMD3<Float>(Float.random(in: 2.5...4), Float.random(in: -0.5...0.5), 0)
+            } else {
+                position = SIMD3<Float>(10, yPos, Float.random(in: -8...(-5)))
+                velocity = SIMD3<Float>(Float.random(in: -4...(-2.5)), Float.random(in: -0.5...0.5), 0)
+            }
         }
         
         let enemy = Enemy(animalType: animalType, position: position, velocity: velocity)
+        print("   Position: \(position), Velocity: \(velocity)")
         enemies.append(enemy)
     }
     
